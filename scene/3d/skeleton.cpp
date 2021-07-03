@@ -676,10 +676,6 @@ void Skeleton::_rebuild_physical_bones_cache() {
 }
 
 void _pb_stop_simulation(Node *p_node) {
-	for (int i = p_node->get_child_count() - 1; 0 <= i; --i) {
-		_pb_stop_simulation(p_node->get_child(i));
-	}
-
 	PhysicalBone *pb = Object::cast_to<PhysicalBone>(p_node);
 	if (pb) {
 		pb->set_simulate_physics(false);
@@ -688,14 +684,11 @@ void _pb_stop_simulation(Node *p_node) {
 }
 
 void Skeleton::physical_bones_stop_simulation() {
-	_pb_stop_simulation(this);
+	for (int i = get_child_count() - 1; 0 <= i; --i)
+		_pb_stop_simulation(get_child(i));
 }
 
 void _pb_start_simulation(const Skeleton *p_skeleton, Node *p_node, const Vector<int> &p_sim_bones) {
-	for (int i = p_node->get_child_count() - 1; 0 <= i; --i) {
-		_pb_start_simulation(p_skeleton, p_node->get_child(i), p_sim_bones);
-	}
-
 	PhysicalBone *pb = Object::cast_to<PhysicalBone>(p_node);
 	if (pb) {
 		bool sim = false;
@@ -733,7 +726,8 @@ void Skeleton::physical_bones_start_simulation_on(const Array &p_bones) {
 		sim_bones.resize(c);
 	}
 
-	_pb_start_simulation(this, this, sim_bones);
+	for (int i = get_child_count() - 1; 0 <= i; --i)
+		_pb_start_simulation(this, get_child(i), sim_bones);
 }
 
 void _physical_bones_add_remove_collision_exception(bool p_add, Node *p_node, RID p_exception) {
